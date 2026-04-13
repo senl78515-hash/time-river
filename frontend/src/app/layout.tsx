@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { WalletProviders } from '@/components/common/WalletProviders'
+import { LangProvider } from '@/lib/i18n'
 import { Toaster } from 'react-hot-toast'
 
 export const metadata: Metadata = {
@@ -20,7 +21,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="zh-CN">
       <body>
         <WalletProviders>
+          <LangProvider>
           {children}
+          </LangProvider>
           <Toaster
             position="top-center"
             toastOptions={{

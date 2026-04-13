@@ -190,6 +190,8 @@ export interface ExperienceNFT {
   price?: number               // SOL 单位
   royalty_bps: number          // 版税基点 e.g. 500 = 5%
   created_at: string
+  sold_count?: number          // 已售出次数
+  tags?: string[]              // 标签
 }
 
 export interface LifeBadge {
