@@ -1,0 +1,154 @@
+{
+  "version": "0.1.0",
+  "name": "time_river",
+  "address": "4nbXrm7iiFt582tH1ohjnGKPYYT6QWG4swamwX18yv19",
+  "metadata": {
+    "name": "time_river",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Time River — Solana On-Chain Memory Proof Program"
+  },
+  "instructions": [
+    {
+      "name": "create_record",
+      "discriminator": [211, 47, 225, 55, 122, 19, 45, 100],
+      "accounts": [
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              { "kind": "const", "value": [114, 101, 99, 111, 114, 100] },
+              { "kind": "account", "path": "owner" },
+              { "kind": "arg", "path": "content_hash" }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        { "name": "content_hash", "type": { "array": ["u8", 32] } },
+        { "name": "arweave_cid", "type": "string" },
+        { "name": "record_type", "type": "u8" },
+        { "name": "encrypted", "type": "bool" }
+      ]
+    },
+    {
+      "name": "mint_sbt",
+      "discriminator": [88, 244, 111, 207, 125, 22, 60, 99],
+      "accounts": [
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "sbt",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              { "kind": "const", "value": [115, 98, 116] },
+              { "kind": "account", "path": "owner" },
+              { "kind": "arg", "path": "badge_type" }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        { "name": "badge_type", "type": "string" },
+        { "name": "metadata_uri", "type": "string" }
+      ]
+    },
+    {
+      "name": "close_record",
+      "discriminator": [35, 128, 216, 194, 155, 212, 57, 187],
+      "accounts": [
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              { "kind": "const", "value": [114, 101, 99, 111, 114, 100] },
+              { "kind": "account", "path": "owner" },
+              { "kind": "account", "path": "record.content_hash" }
+            ]
+          }
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "RecordAccount",
+      "discriminator": [141, 223, 180, 207, 201, 27, 62, 193]
+    },
+    {
+      "name": "SbtAccount",
+      "discriminator": [22, 118, 108, 229, 58, 175, 176, 212]
+    }
+  ],
+  "events": [
+    {
+      "name": "RecordCreated",
+      "discriminator": [76, 193, 110, 82, 200, 41, 119, 244]
+    },
+    {
+      "name": "SbtMinted",
+      "discriminator": [201, 8, 159, 174, 123, 244, 82, 46]
+    }
+  ],
+  "errors": [
+    { "code": 6000, "name": "CidTooLong", "msg": "Arweave CID 超过最大长度 64 字符" },
+    { "code": 6001, "name": "InvalidRecordType", "msg": "记录类型无效（0-4）" },
+    { "code": 6002, "name": "BadgeTypeTooLong", "msg": "徽章类型超过最大长度 32 字符" },
+    { "code": 6003, "name": "MetadataUriTooLong", "msg": "Metadata URI 超过最大长度 200 字符" }
+  ],
+  "types": [
+    {
+      "name": "RecordAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "owner", "type": "pubkey" },
+          { "name": "content_hash", "type": { "array": ["u8", 32] } },
+          { "name": "arweave_cid", "type": "string" },
+          { "name": "record_type", "type": "u8" },
+          { "name": "encrypted", "type": "bool" },
+          { "name": "created_at", "type": "i64" },
+          { "name": "bump", "type": "u8" }
+        ]
+      }
+    },
+    {
+      "name": "SbtAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "owner", "type": "pubkey" },
+          { "name": "badge_type", "type": "string" },
+          { "name": "metadata_uri", "type": "string" },
+          { "name": "earned_at", "type": "i64" },
+          { "name": "bump", "type": "u8" }
+        ]
+      }
+    }
+  ]
+}
