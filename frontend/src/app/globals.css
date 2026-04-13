@@ -345,3 +345,12 @@ body {
 .wallet-adapter-modal-list .wallet-adapter-button:hover {
   transform: none !important;
 }
+
+/* ── Scrollbar hide utility ── */
+.hide-scrollbar {
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* IE / Edge */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;                /* Chrome / Safari */
+}
