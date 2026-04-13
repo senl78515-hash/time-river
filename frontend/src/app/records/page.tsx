@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { NavBar } from '@/components/common/NavBar'
@@ -282,17 +282,17 @@ function MemoryBubble({ record, index, onClick }: {
           {/* Title text */}
           {record.title && (
             <span style={{
-              fontSize: 10,
-              color: 'rgba(255,255,255,0.75)',
+              fontSize: 12,
+              color: 'rgba(255,255,255,0.82)',
               fontWeight: 500,
               textAlign: 'center',
-              maxWidth: cfg.size - 20,
-              lineHeight: 1.3,
+              maxWidth: cfg.size - 16,
+              lineHeight: 1.4,
               overflow: 'hidden',
               display: '-webkit-box',
               WebkitLineClamp: 2,
               WebkitBoxOrient: 'vertical',
-              padding: '0 6px',
+              padding: '0 8px',
             }}>
               {record.title}
             </span>
@@ -397,10 +397,32 @@ function Timeline({ records, onBubbleClick }: {
     ),
   [records])
 
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const drag = useRef({ active: false, startX: 0, scrollLeft: 0 })
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    drag.current = { active: true, startX: e.clientX, scrollLeft: scrollRef.current?.scrollLeft ?? 0 }
+    if (scrollRef.current) scrollRef.current.style.cursor = 'grabbing'
+  }
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!drag.current.active || !scrollRef.current) return
+    e.preventDefault()
+    scrollRef.current.scrollLeft = drag.current.scrollLeft - (e.clientX - drag.current.startX)
+  }
+  const onMouseUp = () => {
+    drag.current.active = false
+    if (scrollRef.current) scrollRef.current.style.cursor = 'grab'
+  }
+
   return (
     <div style={{ position: 'relative' }}>
       {/* Scroll container */}
       <div
+        ref={scrollRef}
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+        onMouseLeave={onMouseUp}
         style={{
           overflowX: 'auto',
           overflowY: 'visible',
@@ -412,6 +434,7 @@ function Timeline({ records, onBubbleClick }: {
           alignItems: 'flex-end',
           gap: 0,
           cursor: 'grab',
+          userSelect: 'none',
         }}
         className="hide-scrollbar"
       >
@@ -894,11 +917,24 @@ export default function RecordsPage() {
 
       <AnimatePresence>
         {showAddModal && (
-          <RecordModal
-            bazi={bazi ?? undefined}
-            onClose={() => setShowAddModal(false)}
-            onSaved={handleSaved}
-          />
+          /* Reset CSS vars to light theme so RecordModal text is readable */
+          <div style={{
+            '--bg-base':        '#F7F5F2',
+            '--bg-card':        '#FFFFFF',
+            '--bg-subtle':      '#F2EDE5',
+            '--text-primary':   '#1A1714',
+            '--text-secondary': '#4A4540',
+            '--text-muted':     '#9C9690',
+            '--border':         '#E8E2D8',
+            '--gold':           '#A87C2A',
+            '--gold-light':     '#FDF3DC',
+          } as React.CSSProperties}>
+            <RecordModal
+              bazi={bazi ?? undefined}
+              onClose={() => setShowAddModal(false)}
+              onSaved={handleSaved}
+            />
+          </div>
         )}
       </AnimatePresence>
     </div>
